@@ -1,0 +1,17 @@
+{
+  "background_page": "background.html",
+   "browser_action": {
+      "default_icon": "icons/icon_32.png",
+      "default_title": "Site Tasks",
+     "popup": "index.html"	  
+   },
+   "description": "Ability to create, organize into categories, set status (Draft, New, Assigned, Requires Verification, Complete) for todo items",
+   "icons": {
+      "128": "icons/icon_128.png",
+      "48": "icons/icon_48.png"
+   },
+   "name": "Site Tasks",
+   "options_page": "options.html",
+   "permissions": [ "tabs", "http://*/*" ],
+   "version": "0.1"   
+}

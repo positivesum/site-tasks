@@ -1,0 +1,25 @@
+/*.urgent { color: #FF6600 !important; }
+.normal { color: black !important; }
+.low { color: gray !important; }*/
+
+#comments .ui-li-aside { margin-top: 1.75em; }
+#comments .status .ui-li-desc { margin: 0.3em 0 !important; overflow: auto; }
+#comments .ui-li-aside { width: 20%; }
+#comments .new-comment { margin-bottom: 2em; }
+
+.attachment img { width: 100%; }
+.attachment h2 { width: 60%; float: left; }
+.attachment .when { width: 40%; float: right; text-align: right; margin-top: 0.75em;}
+.attachment .when .time { font-weight: bold; }
+.attachment .when .date { display: block; font-size: smaller;}
+
+.form-element { margin: 1.5em 1em; }
+
+ .tasks li { vertical-align: middle; }
+ .tasks .status-button { text-align: center; position: absolute; right: 38px; }
+ .tasks .start { width: 5em; }
+ .tasks .finish { width: 5.5em; }
+ .tasks .status-button .ui-btn { margin-top: 0.1em; margin-bottom: 0.1em; }
+ .tasks a { line-height: 2.75em; }
+
+body { min-width:400px; max-width:480px; min-height:400px; max-height:480px;}

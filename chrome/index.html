@@ -1,0 +1,403 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>Tasks</title> 
+<link rel="stylesheet" href="jquery.mobile/jquery.mobile.css" />
+<link rel="stylesheet" href="css/custom.css" />
+<link rel="stylesheet" href="css/moreswatches.css" />
+<link rel="stylesheet"  href="jquery.mobile/jquery.ui.datepicker.mobile.css" />
+<script src="jquery.mobile/jquery.js"></script>
+<script src="jquery.mobile/jquery.mobile.js"></script>
+<script src="jQuery.ui.datepicker.js"></script>
+<script src="jquery.ui.datepicker.mobile.js"></script>
+<script src="js/site-tasks.js"></script>
+<script>
+	//reset type=date inputs to text
+	$( document ).bind( "mobileinit", function(){
+		$.mobile.page.prototype.options.degradeInputs.date = true;
+	});
+		
+	function init() {
+		goToInbox();
+	}
+
+	jQuery(function(){
+		$('.ui-btn-left').live('click',function() {
+			$('a:[href="#active"]').click();	
+		  return false;
+		});
+		
+		$('#details .ui-btn-right').live('click',function(event) {
+			changeStatus(event, current_task_id);
+			$('a:[href="#active"]').click();	
+		  return false;
+		});
+		
+
+		$("a:contains('Active')").live('click',function() {
+			active = true;
+			setContent('active');
+			return false;
+		});
+
+		$("a:contains('Completed')").live('click',function() {
+			active = false;
+			setContent('completed');
+			return false;
+		});
+
+		$("a:contains('My Tasks')").live('click',function() {
+			mytasks = true;	
+			setContent('show-my');
+			return false;
+		});
+
+		$("a:contains('All Tasks')").live('click',function() {
+			mytasks = false;
+			setContent('show-all');
+			return false;
+		});
+
+		$("button[type=submit]:contains('Cancel')").live('click',function() {
+			$('a:[href="#active"]').click();
+			return false;
+		});
+
+		$("button[type=submit]:contains('Update')").live('click',function() {
+			var params = $('#details form').serialize();
+			$('a:[href="#active"]').click();				
+			updateTask(params);
+			return false;
+		});
+
+		$("button[type=submit]:contains('Save')").live('click',function() {
+			var params = $('#add form').serialize();
+			$('a:[href="#active"]').click();				
+			addTask(params);
+			return false;
+		});
+		
+		$('#active').live('pageshow',function(event, ui){
+			setContent('active');
+		});		
+		
+		$('#details').live('pageshow',function(event, ui){
+			setDetails(current_task_id);
+		});	
+
+		$('#add').live('pageshow',function(event, ui){
+			setAdd();
+		});		
+		
+	});
+</script>
+</head> 
+<body onload="init();">
+<div data-role="page" id="active">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Tasks</h1>
+		<a href="#add" data-icon="plus" class="ui-btn-right">Add</a>
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#" class="ui-btn-active">Active</a></li>
+			<li><a href="#completed">Completed</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	<div data-role="content">	
+		<ul data-role="listview" data-dividertheme="b" class="tasks"> 
+			<li data-role="list-divider" >Urgent</li>
+			<!--
+			<li>
+				<div class="status-button start"><input type="button" value="Start"/></div>				
+				<a href="new.html" class="urgent" rel="external">Upload slideshow images</a>
+			</li>
+			-->
+			<li data-role="list-divider">Normal</li>
+			<li data-role="list-divider">Low</li>
+		</ul>
+	</div><!-- /content -->
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#show-my">My Tasks</a></li>
+				<li><a href="#show-all">All Tasks</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /page#active -->
+
+<div data-role="page" id="completed">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Tasks</h1>
+		<a href="#add" data-icon="plus" class="ui-btn-right" >Add</a>
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#active">Active</a></li>
+			<li><a href="#" class="ui-btn-active">Completed</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	<div data-role="content">	
+		<ul data-role="listview" data-dividertheme="b" class="tasks"> 
+		<!--
+			<li> 
+				<h3><a href="new.html">Lorem ipsum dolor sit amet</a></h3> 
+				<p>Completed by <strong>Taras Mankovski</strong> on <strong>December 30th, 2010</strong></p>
+				<span class="ui-li-count">Urgent</span> 
+			</li>
+		-->	
+		</ul>
+	</div><!-- /content -->
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#show-my">My Tasks</a></li>
+				<li><a href="#show-all">All Tasks</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /page#completed -->
+
+<div data-role="page" id="show-my">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Tasks</h1>
+		<a href="#add" data-icon="plus" class="ui-btn-right" >Add</a>
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#active">Active</a></li>
+			<li><a href="#completed">Completed</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	<div data-role="content">	
+		<ul data-role="listview" data-dividertheme="b" class="tasks"> 
+			<li data-role="list-divider" >Urgent</li>
+			<li data-role="list-divider">Normal</li>
+			<li data-role="list-divider">Low</li>
+		</ul>
+	</div><!-- /content -->
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#" class="ui-btn-active">My Tasks</a></li>
+				<li><a href="#show-all">All Tasks</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /page#active -->
+
+<div data-role="page" id="show-all">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Tasks</h1>
+		<a href="#add" data-icon="plus" class="ui-btn-right" >Add</a>
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#active" >Active</a></li>
+			<li><a href="#completed">Completed</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	<div data-role="content">	
+		<ul data-role="listview" data-dividertheme="b" class="tasks"> 
+			<li data-role="list-divider" >Urgent</li>
+			<li data-role="list-divider">Normal</li>
+			<li data-role="list-divider">Low</li>
+		</ul>
+	</div><!-- /content -->
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#show-my" >My Tasks</a></li>
+				<li><a href="#" class="ui-btn-active">All Tasks</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /page#active -->
+
+<div data-role="page" id="details">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Task</h1>
+		<a href="#completed" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop">Finish</a>		
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#" class="ui-btn-active">Details</a></li>
+			<li><a href="#comments">Comments ( 3 )</a></li>
+		</ul>
+	</div><!-- /navbar -->	
+	<div data-role="content">	
+		<form action="index.html" method="post">
+			<div data-role="fieldcontain"> 
+				<label for="title" class="ui-input-text">Title</label>	
+				<input type="text" name="name" id="title" value="Upload slideshow images" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+			</div>
+			<div data-role="fieldcontain"> 			
+				<label for="description" class="ui-input-text">Description</label>	
+				<textarea cols="40" rows="8" name="description" id="textarea" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">There are several images missing from the slideshow, add them.</textarea>
+			</div>
+			<div data-role="fieldcontain"> 
+				<label for="select-choice-1" class="select">Assign to</label> 
+				<select name="select-choice-1" id="select-choice-1"> 
+					<option value="0"> </option> 
+				</select> 
+			</div>				
+			<div data-role="collapsible" data-collapsed="true" class="form-element"> 
+				<h3>Completion Options</h3>
+				<div data-role="fieldcontain"> 			
+					<fieldset data-role="controlgroup"> 
+						<legend>Priority</legend>				
+						<input type="radio" name="radio-choice-1" id="radio-choice-1" value="3" checked="checked" /> 
+						<label for="radio-choice-1">Urgent</label> 
+						<input type="radio" name="radio-choice-1" id="radio-choice-2" value="2"  /> 
+						<label for="radio-choice-2">Normal</label> 
+						<input type="radio" name="radio-choice-1" id="radio-choice-3" value="1"  /> 
+						<label for="radio-choice-3">Low</label> 
+					</fieldset>
+				</div>
+				<div data-role="fieldcontain"> 			
+					<label for="duedate">Due Date</label>
+					<input type="date" name="duedate" id="duedate" value=""  />
+				</div>
+			</div>			
+			<div class="ui-body ui-body-b"> 
+				<fieldset class="ui-grid-a"> 
+					<div class="ui-block-a"><button type="submit" data-theme="d">Cancel</button></div> 
+					<div class="ui-block-b"><button type="submit" data-theme="a">Update</button></div>	   
+				</fieldset> 
+			</div>					
+		</form>
+	</div><!-- /content#details -->
+</div><!-- /page -->
+
+<div data-role="page" id="comments">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Task</h1>
+		<a href="completenew.html" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop" data-theme="b">Finish</a>		
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#details">Details</a></li>
+			<li><a href="#comments" class="ui-btn-active">Comments ( 3 )</a></li>
+		</ul>
+	</div><!-- /navbar -->	
+	<div data-role="content">
+		
+		<div data-role="collapsible" data-collapsed="true" class="new-comment"> 
+			<h3>Make a comment</h3> 
+			<form action="#" method="get"> 
+				<div data-role="fieldcontain">
+					<label for="textarea">Comment:</label>
+					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+				</div>
+				<div data-role="fieldcontain"> 
+					<label for="slider">Attachment:</label> 
+					<input type="file" size="30" id="file" name="file" />
+				</div> 
+				<fieldset class="ui-grid-a"> 
+						<div class="ui-block-a"><button type="submit" data-theme="c">Cancel</button></div> 
+						<div class="ui-block-b"><button type="submit" data-theme="b">Submit</button></div>	   
+				</fieldset> 
+			</form>
+		</div>
+		
+					
+		<ul data-role="listview"> 
+			<li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li> 
+			<li>
+				<img src="images/album-bb.jpg" />
+				<h3><a href="#attachment1">Ana Gervasio</a></h3> 
+				<p>Bone Appetit.</p> 
+				<p class="ui-li-aside"><strong>3:24</strong> PM</p> 
+			</li>
+			<li> 
+				<h3>Taras Mankovski</h3> 
+				<p>Can you please give me a screenshot for this task?</p> 
+				<p class="ui-li-aside"><strong>9:18</strong> AM</p> 					
+			</li> 
+			<li class="status"> 
+				<p><strong>Taras Mankovski</strong> started the task.</p> 
+				<p class="ui-li-aside"><strong>9:17</strong> AM</p> 					
+			</li> 
+			<li data-role="list-divider">Thursday, October 7, 2010 <span class="ui-li-count">1</span></li> 
+			<li class="status"> 
+				<p><strong>Ana Gervais</strong> created task and assigned it to <strong>Taras Mankovski</strong>.</p> 
+				<p class="ui-li-aside"><strong>4:48</strong> PM</p> 
+			</li>				
+		</ul>
+	</div><!-- /content#comments -->
+
+</div><!-- /page -->
+
+
+<div data-role="page" id="attachment1" class="attachment">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Task</h1>
+		<a href="completenew.html" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop">Mark Complete</a>		
+	</div><!-- /header -->
+	<div data-role="navbar" data-theme="a">
+		<ul>
+			<li><a href="#details">Details</a></li>
+			<li><a href="#comments" class="ui-btn-active">Comments ( 3 )</a></li>
+		</ul>
+	</div><!-- /navbar -->	
+	<div data-role="content">	
+		<h2>Ana Gervasio</h2>
+		<p class="when">
+			<span class="time">3:24 PM</span>
+			<span class="date">October 8, 2010</span>
+		</p>
+		<img src="images/album-bb.jpg" /> 
+		<p>Bone Appetit.</p> 
+	</div><!-- /content#attachment1 -->
+</div><!-- /page -->
+
+<div data-role="page" id="add">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Add Task</h1>	
+	</div><!-- /header -->
+	<div data-role="content" >	
+		<form action="index.html" method="post">
+			<div data-role="fieldcontain"> 
+				<label for="title" class="ui-input-text">Title</label>	
+				<input type="text" name="name" id="title" value="" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+			</div>
+			<div data-role="fieldcontain"> 			
+				<label for="description" class="ui-input-text">Description</label>	
+				<textarea cols="40" rows="8" name="description" id="textarea" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c"></textarea>
+			</div>
+			<div data-role="fieldcontain"> 
+				<label for="select-choice-1" class="select">Assign to</label> 
+				<select name="select-choice-1" id="select-choice-1"> 
+					<option value=""> </option> 
+				</select> 
+			</div>
+			<div data-role="collapsible" data-collapsed="true" class="form-element"> 
+				<h3>Completion Options</h3>
+				<div data-role="fieldcontain"> 			
+				    <fieldset data-role="controlgroup"> 
+				    	<legend>Priority</legend>				
+						<input type="radio" name="radio-choice-1" id="radio-choice-1" value="3" checked="checked" /> 
+						<label for="radio-choice-1">Urgent</label> 
+						<input type="radio" name="radio-choice-1" id="radio-choice-2" value="2"  /> 
+						<label for="radio-choice-2">Normal</label> 
+						<input type="radio" name="radio-choice-1" id="radio-choice-3" value="1"  /> 
+						<label for="radio-choice-3">Low</label> 
+					</fieldset>
+				</div>
+				<div data-role="fieldcontain"> 			
+					<label for="duedate">Due Date</label>
+	                <input type="date" name="duedate" id="duedate" value=""  />
+				</div>
+			</div>				
+			<div class="ui-body ui-body-b"> 
+				<fieldset class="ui-grid-a"> 
+					<div class="ui-block-a"><button type="submit" data-theme="d">Cancel</button></div> 
+					<div class="ui-block-b"><button type="submit" data-theme="a">Save</button></div>	   
+				</fieldset> 
+			</div>					
+		</form>
+	</div><!-- /content#details -->
+</div><!-- /page -->
+</body>
+</html>

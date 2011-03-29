@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Site Tasks - Options</title>
+</head>
+<body>
+<div id="header"><h1>Site Tasks - Options</h1></div>
+
+<div class="section-header first">Wordpress Site URL</div>
+<p><b>Site Tasks</b> needs Wordpress Site to work. Enter it below</p>
+<p>
+  http://<input type="text" id="custom-domain" oninput="markDirty()">/</p>
+    <p><em>(eg 'example.wordpress.com')</em></p>
+
+<div id="footer">
+  <button id="save-button" style="font-weight:bold" onclick="save()"
+    >Save</button>
+  <button onclick="init()">Cancel</button>
+</div>
+<p id="sig">Created by <a href="http://www.odesk.com/users/~~94ca72c849152a57">Alexander Yachmenev</a></p>
+<script>
+var customDomainsTextbox;
+var saveButton;
+
+init();
+
+function init() {
+  customDomainsTextbox = document.getElementById("custom-domain");
+  saveButton = document.getElementById("save-button");
+
+  customDomainsTextbox.value = localStorage.customDomain || "";
+  markClean();
+}
+
+function save() {
+  localStorage.customDomain = customDomainsTextbox.value;
+  markClean();
+
+  chrome.extension.getBackgroundPage().init();
+}
+
+function markDirty() {
+  saveButton.disabled = false;
+}
+
+function markClean() {
+  saveButton.disabled = true;
+}
+</script>
+</body>
+</html>
