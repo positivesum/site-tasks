@@ -107,7 +107,7 @@ function getTasks(url) {
 	jQuery.ajax({
 	   type: "POST",
 	   url: getBlogUrl() + "/wp-admin/admin-ajax.php",
-	   data: 'action=site_tasks&operation=get-tasks' + 
+	   data: 'action=chrome_site_tasks&operation=get-tasks' + 
 			 '&url='	+ url,			 
        dataType: 'json',	   
 	   success: function(data){
@@ -132,7 +132,7 @@ function updateTask(params) {
 	jQuery.ajax({
 	   type: "POST",
 	   url: getBlogUrl() + "/wp-admin/admin-ajax.php",
-	   data: 'action=site_tasks&operation=update-task' + 
+	   data: 'action=chrome_site_tasks&operation=update-task' + 
 			 '&url='	+ page_url +
 			 '&id='	+ current_task_id +
 			 '&' + params,			 
@@ -158,13 +158,12 @@ function addTask(params) {
 	jQuery.ajax({
 	   type: "POST",
 	   url: getBlogUrl() + "/wp-admin/admin-ajax.php",
-	   data: 'action=site_tasks&operation=add-task' + 
+	   data: 'action=chrome_site_tasks&operation=add-task' + 
 			 '&url='	+ page_url +
 			 '&' + params,			 
        dataType: 'json',	   
 	   success: function(data){
 			if (data.result) {
-				alert(JSON.stringify(data.result));
 				tasks = data.result.tasks;
 				users = data.result.users;
 				current_user = data.result.current_user;
@@ -184,7 +183,7 @@ function changeStatus(event, id) {
 	jQuery.ajax({
 	   type: "POST",
 	   url: getBlogUrl() + "/wp-admin/admin-ajax.php",
-	   data: 'action=site_tasks&operation=change-status' + 
+	   data: 'action=chrome_site_tasks&operation=change-status' + 
 			 '&url='	+ page_url +
 			 '&id='	+ id,			 
        dataType: 'json',	   
@@ -217,16 +216,16 @@ function setContent(page) {
 				var listDivider = null;
 				var classLink = ''; 
 				var priority = '';
-				if (mytasks && (task.custom.todo_owner[0] != current_user.ID)) {
+				if (mytasks && (task.custom.tasks_owner[0] != current_user.ID)) {
 					continue;
 				}
-				if (task.custom.todo_status[0] != 6) {
-					if (task.custom.todo_status[0] < 2) {
+				if (task.custom.tasks_status[0] != 6) {
+					if (task.custom.tasks_status[0] < 2) {
 						status = 'Start';
 					} else {
 						status = 'Finish';
 					}
-					switch (task.custom.todo_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+					switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
 						case '1': listDivider = $("#active li:contains('Low')");
 							classLink = 'low';
 							break;
@@ -249,11 +248,11 @@ function setContent(page) {
 			for (var i in tasks) {
 				var task = tasks[i];
 				var priority = '';
-				if (mytasks && (task.custom.todo_owner[0] != current_user.ID)) {
+				if (mytasks && (task.custom.tasks_owner[0] != current_user.ID)) {
 					continue;
 				}
-				if (task.custom.todo_status[0] == 6) {
-					switch (task.custom.todo_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+				if (task.custom.tasks_status[0] == 6) {
+					switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
 						case '1': priority = 'Low';
 							break;
 						case '2': priority = 'Normal';
@@ -261,7 +260,7 @@ function setContent(page) {
 						case '3': priority = 'Urgent';
 							break;
 					}			
-					$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.todo_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#completed ul:[data-role="listview"]');
+					$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#completed ul:[data-role="listview"]');
 				}
 			}
 			$('#completed ul:[data-role="listview"]').listview('refresh');
@@ -274,16 +273,16 @@ function setContent(page) {
 					var task = tasks[i];
 					var listDivider = null;
 					var classLink = ''; 
-					if (task.custom.todo_owner[0] != current_user.ID) {
+					if (task.custom.tasks_owner[0] != current_user.ID) {
 						continue;
 					}
-					if (task.custom.todo_status[0] != 6) {
-						if (task.custom.todo_status[0] < 2) {
+					if (task.custom.tasks_status[0] != 6) {
+						if (task.custom.tasks_status[0] < 2) {
 							status = 'Start';
 						} else {
 							status = 'Finish';
 						}
-						switch (task.custom.todo_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+						switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
 							case '1': listDivider = $("#show-my li:contains('Low')");
 								classLink = 'low';
 								break;
@@ -303,11 +302,11 @@ function setContent(page) {
 				for (var i in tasks) {
 					var task = tasks[i];
 					var priority = '';
-					if (task.custom.todo_owner[0] != current_user.ID) {
+					if (task.custom.tasks_owner[0] != current_user.ID) {
 						continue;
 					}
-					if (task.custom.todo_status[0] == 6) {
-						switch (task.custom.todo_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+					if (task.custom.tasks_status[0] == 6) {
+						switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
 							case '1': priority = 'Low';
 								break;
 							case '2': priority = 'Normal';
@@ -315,7 +314,7 @@ function setContent(page) {
 							case '3': priority = 'Urgent';
 								break;
 						}			
-						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.todo_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-my ul:[data-role="listview"]');
+						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-my ul:[data-role="listview"]');
 						
 					}
 				}
@@ -330,13 +329,13 @@ function setContent(page) {
 					var task = tasks[i];
 					var listDivider = null;
 					var classLink = ''; 
-					if (task.custom.todo_status[0] != 6) {
-						if (task.custom.todo_status[0] < 2) {
+					if (task.custom.tasks_status[0] != 6) {
+						if (task.custom.tasks_status[0] < 2) {
 							status = 'Start';
 						} else {
 							status = 'Finish';
 						}
-						switch (task.custom.todo_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+						switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
 							case '1': listDivider = $("#show-all li:contains('Low')");
 								classLink = 'low';
 								break;
@@ -356,8 +355,8 @@ function setContent(page) {
 				for (var i in tasks) {
 					var task = tasks[i];
 					var priority = '';
-					if (task.custom.todo_status[0] == 6) {
-						switch (task.custom.todo_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+					if (task.custom.tasks_status[0] == 6) {
+						switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
 							case '1': priority = 'Low';
 								break;
 							case '2': priority = 'Normal';
@@ -365,7 +364,7 @@ function setContent(page) {
 							case '3': priority = 'Urgent';
 								break;
 						}			
-						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.todo_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-all ul:[data-role="listview"]');
+						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-all ul:[data-role="listview"]');
 					}
 				}
 			}
@@ -382,8 +381,8 @@ function setDetails(id) {
 		}
 	}
 	if (task != null) {
-		if (task.custom.todo_status[0] != 6) {
-			if (task.custom.todo_status[0] < 2) {
+		if (task.custom.tasks_status[0] != 6) {
+			if (task.custom.tasks_status[0] < 2) {
 				status = 'Start';
 			} else {
 				status = 'Finish';
@@ -398,7 +397,7 @@ function setDetails(id) {
 		$('#details #textarea').val(task.post_content);
 		$('#details #select-choice-1').empty();
 		for (var i in users) {
-			if (task.custom.todo_owner[0] == users[i].ID) {
+			if (task.custom.tasks_owner[0] == users[i].ID) {
 				var obj = $('<option value="' + users[i].ID + '" selected >' + users[i].first_name + ' ' + users[i].last_name + '</option>');
 			} else {
 				var obj = $('<option value="' + users[i].ID + '">' + users[i].first_name + ' ' + users[i].last_name + '</option>');
@@ -406,9 +405,9 @@ function setDetails(id) {
 			obj.appendTo('#details #select-choice-1');
 		}
 		$('#details #select-choice-1').selectmenu('refresh', true);
-		$('#details input[type=radio][value="' + task.custom.todo_priority[0] + '"]').attr('checked',true);
+		$('#details input[type=radio][value="' + task.custom.tasks_priority[0] + '"]').attr('checked',true);
 		$('#details input[type=radio]').checkboxradio("refresh");
-		var date_due = new Date(task.custom.todo_date_due[0] * 1000);
+		var date_due = new Date(task.custom.tasks_date_due[0] * 1000);
 		var month = date_due.getMonth() + 1;
 		$('#details #duedate').val( date_due.getFullYear() + '-' + month + '-' +  date_due.getDate());
 	}
