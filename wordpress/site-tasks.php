@@ -172,8 +172,12 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 						$id = intval($_REQUEST['id']);
 						$tasks_status = get_post_meta( $id , 'tasks_status' , true );
 						++$tasks_status;
-						if ($tasks_status > 2) {
-							$tasks_status = 6;
+						if ($tasks_status > 6) {
+							$tasks_status = 1;
+						} else {
+							if ($tasks_status > 2) {
+								$tasks_status = 6;
+							}
 						}
 						update_post_meta($id, 'tasks_status', $tasks_status);
 					break;

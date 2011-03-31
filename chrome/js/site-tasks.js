@@ -387,11 +387,13 @@ function setDetails(id) {
 			} else {
 				status = 'Finish';
 			}
-			$('#details a.ui-btn-right span.ui-btn-text').html(status);
-			$('#details a.ui-btn-right').show();
+			// $('#details a.ui-btn-right').show();
 		} else {
-			$('#details a.ui-btn-right').hide();
+			// $('#details a.ui-btn-right').hide();
+			status = 'Restart';
 		}
+
+		$('#details a.ui-btn-right span.ui-btn-text').html(status);
 	
 		$('#details #title').val(task.post_title);
 		$('#details #textarea').val(task.post_content);
