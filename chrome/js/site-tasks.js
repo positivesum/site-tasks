@@ -11,6 +11,54 @@ function dateToStr(time) {
 	return d.toDateString();
 }
 
+function getDateFromComment(str) {
+	str = str.replace(/-/g, "/");
+	return new Date(str);
+}
+
+function compareDates(date1, date2) {
+
+	var day1 =  date1.getDate();
+	var month1 =  date1.getMonth();
+	var year1 =  date1.getFullYear();
+
+	var day2 =  date2.getDate();
+	var month2 =  date2.getMonth();
+	var year2 =  date2.getFullYear();
+
+	if ((year1 == year2) && (month1 == month2) && (day1 == day2)) {
+		return 0;
+	} else {
+		if (date1 > date2) {
+			return 1;
+		} else {
+			return -1;
+		}
+	}
+}
+
+function getTaskById(id) {
+	var task = null;
+	for (var i in tasks) {
+		if (tasks[i].ID == id) {
+			task = tasks[i];
+			break;
+		}
+	}
+	return task;
+}
+
+function getUserById(id) {
+	var user = null;
+	for (var i in users) {
+		if (users[i].ID == id) {
+			user = users[i];
+			break;
+		}
+	}
+	return user;
+}
+
 // get the URL of the blog
 // e.g. http://example.com
 function getBlogUrl() {
@@ -177,6 +225,33 @@ function addTask(params) {
 	 });			
 }
 
+function addComment(params) {
+	//cue the page loader 			
+	$.mobile.pageLoading();	
+	jQuery.ajax({
+	   type: "POST",
+	   url: getBlogUrl() + "/wp-admin/admin-ajax.php",
+	   data: 'action=chrome_site_tasks&operation=add-comment' + 
+			 '&url='	+ page_url +
+			 '&id='	+ current_task_id +			 
+			 '&' + params,			 
+       dataType: 'json',	   
+	   success: function(data){
+			if (data.result) {
+				tasks = data.result.tasks;
+				users = data.result.users;
+				current_user = data.result.current_user;
+				setComments(current_task_id);
+				// setContent('active');
+				$.mobile.pageLoading( true );
+			}
+	   },
+		error: function(XMLHttpRequest, textStatus, errorThrown){
+			alert(textStatus);		
+		}	   
+	 });			
+}
+
 function changeStatus(event, id) {
 	//cue the page loader 			
 	$.mobile.pageLoading();	
@@ -324,7 +399,7 @@ function setContent(page) {
 		case 'show-all': 
 			$('#show-all ul:[data-role="listview"]').empty();
 			if (active) {
-				$('<li data-role="list-divider" >Urgent</li><li data-role="list-divider">Normal</li><li data-role="list-divider">Low</li>').appendTo($('#show-all ul:[data-role="listview"]'));
+				$('<li data-role="list-divider" >Urgent</li><li data-role="list-divider">Normal</li><li data-role="list-divider">Low</li>').appendTo('#show-all ul:[data-role="listview"]');
 				for (var i in tasks) {
 					var task = tasks[i];
 					var listDivider = null;
@@ -374,12 +449,7 @@ function setContent(page) {
 }
 
 function setDetails(id) {
-	var task = null;
-	for (var i in tasks) {
-		if (tasks[i].ID == id) {
-			task = tasks[i];
-		}
-	}
+	var task = getTaskById(id);
 	if (task != null) {
 		if (task.custom.tasks_status[0] != 6) {
 			if (task.custom.tasks_status[0] < 2) {
@@ -392,9 +462,11 @@ function setDetails(id) {
 			// $('#details a.ui-btn-right').hide();
 			status = 'Restart';
 		}
-
 		$('#details a.ui-btn-right span.ui-btn-text').html(status);
-	
+				
+		var comment_count = 'Comments ( ' + task.comment_count + ' )';
+		$('#details li.ui-block-b span.ui-btn-text').text(comment_count);
+		
 		$('#details #title').val(task.post_title);
 		$('#details #textarea').val(task.post_content);
 		$('#details #select-choice-1').empty();
@@ -429,4 +501,62 @@ function setAdd() {
 	var date_due = new Date();
 	var month = date_due.getMonth() + 1;
 	$('#add #duedate').val( date_due.getFullYear() + '-' + month + '-' +  date_due.getDate());
+}
+
+function setComments(id) {
+	var task = getTaskById(id);
+	if (task != null) {
+		if (task.custom.tasks_status[0] != 6) {
+			if (task.custom.tasks_status[0] < 2) {
+				status = 'Start';
+			} else {
+				status = 'Finish';
+			}
+		} else {
+			status = 'Restart';
+		}
+		$('#comments a.ui-btn-right span.ui-btn-text').html(status);
+				
+		var comment_count = 'Comments ( ' + task.comment_count + ' )';
+		$('#comments li.ui-block-b span.ui-btn-text').text(comment_count);
+		$('#comments ul:[data-role="listview"]').empty();
+		var user = null;
+		var current_date = new Date();
+		var task_date = null;
+		var count = 0;
+		var name = '';
+		var hours = '';
+		var minutes = '';
+		var time = '';
+		for (var i in task.comments) {
+			user_id = task.comments[i].user_id;
+			user = getUserById(user_id);
+			task_date = getDateFromComment(task.comments[i].comment_date);
+			if (compareDates(current_date, task_date) != 0) {
+				current_date = task_date;
+				$('<li data-role="list-divider">' + current_date.toDateString() + '<span class="ui-li-count"></span></li>').appendTo('#comments ul:[data-role="listview"]'); 
+			}
+			if (user != null) {
+				name = user.first_name + ' ' + user.last_name;
+			}
+
+			hours = task_date.getHours();
+			minutes = task_date.getMinutes();
+			if (hours > 11) {
+				if (hours != 12) {
+					hours = hours - 12;
+				}
+				time = '<strong>' + hours + ':' + minutes + '</strong> PM';
+			} else {
+				time = '<strong>' + hours + ':' + minutes + '</strong> AM';
+			}
+			$('<li><h3>' + name + '</h3><p>' + task.comments[i].comment_content + '</p><p class="ui-li-aside">' + time + '</p></li>').appendTo('#comments ul:[data-role="listview"]'); 
+		}
+		count = $('#comments ul:[data-role="listview"] li span.ui-li-count').length;
+		$('#comments ul:[data-role="listview"] li span.ui-li-count').each(function(index) {
+			$(this).text(count - index);
+		});
+
+		$('#comments ul:[data-role="listview"]').listview('refresh');		
+	}
 }

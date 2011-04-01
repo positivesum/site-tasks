@@ -76,6 +76,13 @@
 			addTask(params);
 			return false;
 		});
+
+		$("button[type=submit]:contains('Submit')").live('click',function() {
+			var params = $('#comments form').serialize();
+			$('#details a:[href="#comments"]').click();				
+			addComment(params);
+			return false;
+		});
 		
 		$('#active').live('pageshow',function(event, ui){
 			setContent('active');
@@ -89,6 +96,10 @@
 			setAdd();
 		});		
 		
+		$('#comments').live('pageshow',function(event, ui){
+			setComments(current_task_id);
+		});		
+
 	});
 </script>
 </head> 
@@ -218,12 +229,12 @@
 <div data-role="page" id="details">
 	<div data-role="header" data-theme="a" data-position="inline">
 		<h1>Task</h1>
-		<a href="#completed" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop">Finish</a>		
+		<a href="#details" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop">Finish</a>		
 	</div><!-- /header -->
 	<div data-role="navbar" data-theme="a">
 		<ul>
 			<li><a href="#" class="ui-btn-active">Details</a></li>
-			<li><a href="#comments">Comments ( 3 )</a></li>
+			<li><a href="#comments"></a></li>
 		</ul>
 	</div><!-- /navbar -->	
 	<div data-role="content">	
@@ -273,12 +284,12 @@
 <div data-role="page" id="comments">
 	<div data-role="header" data-theme="a" data-position="inline">
 		<h1>Task</h1>
-		<a href="completenew.html" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop" data-theme="b">Finish</a>		
+		<a href="#details" data-icon="check" class="ui-btn-right" data-rel="dialog" data-transition="pop">Finish</a>		
 	</div><!-- /header -->
 	<div data-role="navbar" data-theme="a">
 		<ul>
 			<li><a href="#details">Details</a></li>
-			<li><a href="#comments" class="ui-btn-active">Comments ( 3 )</a></li>
+			<li><a href="#" class="ui-btn-active">Comments ( 3 )</a></li>
 		</ul>
 	</div><!-- /navbar -->	
 	<div data-role="content">
@@ -300,9 +311,8 @@
 				</fieldset> 
 			</form>
 		</div>
-		
-					
-		<ul data-role="listview"> 
+		<ul data-role="listview">
+			<!--
 			<li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li> 
 			<li>
 				<img src="images/album-bb.jpg" />
@@ -315,15 +325,7 @@
 				<p>Can you please give me a screenshot for this task?</p> 
 				<p class="ui-li-aside"><strong>9:18</strong> AM</p> 					
 			</li> 
-			<li class="status"> 
-				<p><strong>Taras Mankovski</strong> started the task.</p> 
-				<p class="ui-li-aside"><strong>9:17</strong> AM</p> 					
-			</li> 
-			<li data-role="list-divider">Thursday, October 7, 2010 <span class="ui-li-count">1</span></li> 
-			<li class="status"> 
-				<p><strong>Ana Gervais</strong> created task and assigned it to <strong>Taras Mankovski</strong>.</p> 
-				<p class="ui-li-aside"><strong>4:48</strong> PM</p> 
-			</li>				
+			-->
 		</ul>
 	</div><!-- /content#comments -->
 
