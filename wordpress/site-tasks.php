@@ -88,7 +88,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 				'hierarchical' => false,
 				'rewrite' => array("slug" => "site_tasks"), // Permalinks
 				'query_var' => false, // This goes to the WP_Query schema
-				'supports' => array('title', 'editor', 'author')
+				'supports' => array('title', 'editor', 'author', 'comments')
 			));
 
 			register_taxonomy( self::TAG, self::POSTTYPE, array(
@@ -137,6 +137,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 		}
 
 		function site_tasks_chrome_ajax() {
+			global $wpdb;
 			$response = array();
 			// Allowed actions: add, update, delete
 			$action = isset( $_REQUEST['operation'] ) ? $_REQUEST['operation'] : 'add';
@@ -158,6 +159,38 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 						$date = mktime(0, 0, 0, $parts[1], $parts[2], $parts[0]);						
 						update_post_meta($id, 'tasks_date_due', $date);
 						update_post_meta($id, 'tasks_status',1);
+						
+						$comment_post_ID = $id;
+						$user = wp_get_current_user();
+						$user_ID = $user->ID;
+						if ( empty( $user->display_name ) )
+							$user->display_name=$user->user_login;
+						$comment_author       = $wpdb->escape($user->display_name);
+						$comment_author_email = $wpdb->escape($user->user_email);
+						$comment_author_url   = $wpdb->escape($user->user_url);						
+						$comment_type = '';
+						$author = $user->first_name + ' ' + $user->last_name;
+						
+						$tasks_owner = get_userdata($_REQUEST['select-choice-1']);
+						$tasks_owner_name = $tasks_owner->first_name + ' ' + $tasks_owner->last_name;						
+						$comment_content = $comment_author." created task and assigned it to ".$tasks_owner_name;
+						$commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'user_ID');
+						$comment_id = wp_new_comment( $commentdata );						
+					break;
+					case 'add-comment':	
+						$id = intval($_REQUEST['id']);
+						$comment_post_ID = $id;
+						$user = wp_get_current_user();
+						$user_ID = $user->ID;
+						if ( empty( $user->display_name ) )
+							$user->display_name=$user->user_login;
+						$comment_author       = $wpdb->escape($user->display_name);
+						$comment_author_email = $wpdb->escape($user->user_email);
+						$comment_author_url   = $wpdb->escape($user->user_url);						
+						$comment_type = '';
+						$comment_content = $_REQUEST['textarea'];
+						$commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'user_ID');
+						$comment_id = wp_new_comment( $commentdata );						
 					break;
 					case 'update-task':	
 						$id = intval($_REQUEST['id']);
@@ -228,6 +261,8 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 					$id = get_post_meta( $id , 'tasks_owner' , true ); 				
 					$user_info = get_userdata($id);
 					$site_tasks->user_info = $user_info;
+					$comments = get_comments(array('post_id' => $site_tasks->ID));
+					$site_tasks->comments = $comments;
 				}
 			}
 			return $site_tasks_list;			
@@ -835,3 +870,4 @@ meta_value=%s", $page_id ));
 	global $site_tasks;
 	$site_tasks = new The_Site_Tasks();	
 }
+
