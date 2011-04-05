@@ -155,8 +155,8 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 						update_post_meta($id, 'tasks_post_type', $post->post_type);
 						update_post_meta($id, 'tasks_owner', $_REQUEST['select-choice-1']);
 						update_post_meta($id, 'tasks_priority', $_REQUEST['radio-choice-1']);
-						$parts = explode("-", $_REQUEST['duedate']);
-						$date = mktime(0, 0, 0, $parts[1], $parts[2], $parts[0]);						
+						$parts = explode("/", $_REQUEST['duedate']);
+						$date = mktime(0, 0, 0, $parts[0], $parts[1], $parts[2]);						
 						update_post_meta($id, 'tasks_date_due', $date);
 						update_post_meta($id, 'tasks_status',1);
 						
@@ -169,11 +169,11 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 						$comment_author_email = $wpdb->escape($user->user_email);
 						$comment_author_url   = $wpdb->escape($user->user_url);						
 						$comment_type = '';
-						$author = $user->first_name + ' ' + $user->last_name;
+						$author = $user->first_name . ' ' . $user->last_name;
 						
-						$tasks_owner = get_userdata($_REQUEST['select-choice-1']);
-						$tasks_owner_name = $tasks_owner->first_name + ' ' + $tasks_owner->last_name;						
-						$comment_content = $comment_author." created task and assigned it to ".$tasks_owner_name;
+						$tasks_owner = get_userdata(intval($_REQUEST['select-choice-1']));
+						$tasks_owner_name = $tasks_owner->first_name . ' ' . $tasks_owner->last_name;						
+						$comment_content = $author." created task and assigned it to ".$tasks_owner_name;
 						$commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'user_ID');
 						$comment_id = wp_new_comment( $commentdata );						
 					break;
@@ -190,15 +190,34 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 						$comment_type = '';
 						$comment_content = $_REQUEST['textarea'];
 						$commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'user_ID');
-						$comment_id = wp_new_comment( $commentdata );						
+						$comment_id = wp_new_comment( $commentdata );
+/*						
+						$slug = '';
+						$bits = file_get_contents();
+						$file = wp_upload_bits( $slug, NULL, $bits);
+						$url = $file['url'];
+						$file = $file['file'];
+
+						// Construct the attachment array
+						$attachment = array(
+							'post_title' => $slug,
+							'post_content' => $slug,
+							'post_status' => 'attachment',
+							'post_parent' => 0,
+							'post_mime_type' => $type,
+							'guid' => $url
+							);
+						// Save the data
+						$postID = wp_insert_attachment($attachment, $file);
+*/
 					break;
 					case 'update-task':	
 						$id = intval($_REQUEST['id']);
 						wp_update_post( array( 'ID' => $id, 'post_title' => $_REQUEST['name'], 'post_content' => $_REQUEST['description'] ) );
 						update_post_meta($id, 'tasks_owner', $_REQUEST['select-choice-1']);
 						update_post_meta($id, 'tasks_priority', $_REQUEST['radio-choice-1']);
-						$parts = explode("-", $_REQUEST['duedate']);
-						$date = mktime(0, 0, 0, $parts[1], $parts[2], $parts[0]);						
+						$parts = explode("/", $_REQUEST['duedate']);
+						$date = mktime(0, 0, 0, $parts[0], $parts[1], $parts[2]);						
 						update_post_meta($id, 'tasks_date_due', $date);
 					break;
 					case 'change-status':	
@@ -870,4 +889,3 @@ meta_value=%s", $page_id ));
 	global $site_tasks;
 	$site_tasks = new The_Site_Tasks();	
 }
-
