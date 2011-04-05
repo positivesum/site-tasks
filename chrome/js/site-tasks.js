@@ -449,6 +449,8 @@ function setContent(page) {
 }
 
 function setDetails(id) {
+	$("#comments li.ui-block-b a").removeClass('ui-btn-active');
+	$("a:contains('Details')").addClass('ui-btn-active');
 	var task = getTaskById(id);
 	if (task != null) {
 		if (task.custom.tasks_status[0] != 6) {
@@ -483,7 +485,14 @@ function setDetails(id) {
 		$('#details input[type=radio]').checkboxradio("refresh");
 		var date_due = new Date(task.custom.tasks_date_due[0] * 1000);
 		var month = date_due.getMonth() + 1;
-		$('#details #duedate').val( date_due.getFullYear() + '-' + month + '-' +  date_due.getDate());
+		if (month < 10) {
+			month = '0' + month;
+		}
+		var day = date_due.getDate();
+		if (day < 10) {
+			day = '0' + day;
+		}
+		$('#details #duedate').val(  month + '/' + day + '/' +  date_due.getFullYear() );
 	}
 }
 
@@ -500,10 +509,19 @@ function setAdd() {
 	$('#add #select-choice-1').selectmenu('refresh', true);
 	var date_due = new Date();
 	var month = date_due.getMonth() + 1;
-	$('#add #duedate').val( date_due.getFullYear() + '-' + month + '-' +  date_due.getDate());
+	if (month < 10) {
+		month = '0' + month;
+	}
+	var day = date_due.getDate();
+	if (day < 10) {
+		day = '0' + day;
+	}
+	$('#add #duedate').val(  month + '/' + day + '/' +  date_due.getFullYear() );
 }
 
 function setComments(id) {
+	$("a:contains('Details')").removeClass('ui-btn-active');
+	$("#comments li.ui-block-b a").addClass('ui-btn-active');
 	var task = getTaskById(id);
 	if (task != null) {
 		if (task.custom.tasks_status[0] != 6) {
@@ -521,7 +539,7 @@ function setComments(id) {
 		$('#comments li.ui-block-b span.ui-btn-text').text(comment_count);
 		$('#comments ul:[data-role="listview"]').empty();
 		var user = null;
-		var current_date = new Date();
+		var current_date = new Date('1970/01/01');
 		var task_date = null;
 		var count = 0;
 		var name = '';
@@ -542,6 +560,9 @@ function setComments(id) {
 
 			hours = task_date.getHours();
 			minutes = task_date.getMinutes();
+			if (minutes < 10) {
+				minutes = '0' + minutes;
+			}
 			if (hours > 11) {
 				if (hours != 12) {
 					hours = hours - 12;

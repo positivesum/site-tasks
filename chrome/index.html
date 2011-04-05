@@ -6,10 +6,11 @@
 <link rel="stylesheet" href="css/custom.css" />
 <link rel="stylesheet" href="css/moreswatches.css" />
 <link rel="stylesheet"  href="jquery.mobile/jquery.ui.datepicker.mobile.css" />
-<script src="jquery.mobile/jquery.js"></script>
-<script src="jquery.mobile/jquery.mobile.js"></script>
-<script src="jQuery.ui.datepicker.js"></script>
-<script src="jquery.ui.datepicker.mobile.js"></script>
+<script type="text/javascript" src="jquery.mobile/jquery.js"></script>
+<script type="text/javascript" src="jquery.mobile/jquery.mobile.js"></script>
+<script type="text/javascript" src="jquery.mobile/jQuery.ui.datepicker.js"></script>
+<script type="text/javascript" src="jquery.mobile/jquery.ui.datepicker.mobile.js"></script>
+<script type="text/javascript" src="jquery.mobile/jquery.form.js"></script> 
 <script src="js/site-tasks.js"></script>
 <script>
 	//reset type=date inputs to text
@@ -18,7 +19,7 @@
 	});
 		
 	function init() {
-		goToInbox();
+		getTasks(localStorage.url);
 	}
 
 	jQuery(function(){
@@ -79,7 +80,7 @@
 
 		$("button[type=submit]:contains('Submit')").live('click',function() {
 			var params = $('#comments form').serialize();
-			$('#details a:[href="#comments"]').click();				
+			$('#details a:[href="#comments"]').click();	
 			addComment(params);
 			return false;
 		});
@@ -226,6 +227,54 @@
 	</div><!-- /footer -->
 </div><!-- /page#active -->
 
+<div data-role="page" id="add">
+	<div data-role="header" data-theme="a" data-position="inline">
+		<h1>Add Task</h1>	
+	</div><!-- /header -->
+	<div data-role="content" >	
+		<form action="index.html" method="post">
+			<div data-role="fieldcontain"> 
+				<label for="title" class="ui-input-text">Title</label>	
+				<input type="text" name="name" id="title" value="" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+			</div>
+			<div data-role="fieldcontain"> 			
+				<label for="description" class="ui-input-text">Description</label>	
+				<textarea cols="40" rows="8" name="description" id="textarea" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c"></textarea>
+			</div>
+			<div data-role="fieldcontain"> 
+				<label for="select-choice-1" class="select">Assign to</label> 
+				<select name="select-choice-1" id="select-choice-1"> 
+					<option value=""> </option> 
+				</select> 
+			</div>
+			<div data-role="collapsible" data-collapsed="true" class="form-element"> 
+				<h3>Completion Options</h3>
+				<div data-role="fieldcontain"> 			
+				    <fieldset data-role="controlgroup"> 
+				    	<legend>Priority</legend>				
+						<input type="radio" name="radio-choice-1" id="radio-choice-1" value="3" checked="checked" /> 
+						<label for="radio-choice-1">Urgent</label> 
+						<input type="radio" name="radio-choice-1" id="radio-choice-2" value="2"  /> 
+						<label for="radio-choice-2">Normal</label> 
+						<input type="radio" name="radio-choice-1" id="radio-choice-3" value="1"  /> 
+						<label for="radio-choice-3">Low</label> 
+					</fieldset>
+				</div>
+				<div data-role="fieldcontain"> 			
+					<label for="duedate">Due Date</label>
+					<input type="true" data-type="date" name="duedate" id="duedate" value=""/>
+				</div>
+			</div>				
+			<div class="ui-body ui-body-b"> 
+				<fieldset class="ui-grid-a"> 
+					<div class="ui-block-a"><button type="submit" data-theme="d">Cancel</button></div> 
+					<div class="ui-block-b"><button type="submit" data-theme="a">Save</button></div>	   
+				</fieldset> 
+			</div>					
+		</form>
+	</div><!-- /content#details -->
+</div><!-- /page -->
+
 <div data-role="page" id="details">
 	<div data-role="header" data-theme="a" data-position="inline">
 		<h1>Task</h1>
@@ -234,7 +283,7 @@
 	<div data-role="navbar" data-theme="a">
 		<ul>
 			<li><a href="#" class="ui-btn-active">Details</a></li>
-			<li><a href="#comments"></a></li>
+			<li><a href="#comments">Comments</a></li>
 		</ul>
 	</div><!-- /navbar -->	
 	<div data-role="content">	
@@ -268,7 +317,7 @@
 				</div>
 				<div data-role="fieldcontain"> 			
 					<label for="duedate">Due Date</label>
-					<input type="date" name="duedate" id="duedate" value=""  />
+					<input type="true" data-type="date" name="duedate" id="duedate" value=""/>
 				</div>
 			</div>			
 			<div class="ui-body ui-body-b"> 
@@ -289,21 +338,20 @@
 	<div data-role="navbar" data-theme="a">
 		<ul>
 			<li><a href="#details">Details</a></li>
-			<li><a href="#" class="ui-btn-active">Comments ( 3 )</a></li>
+			<li><a href="#" class="ui-btn-active">Comments</a></li>
 		</ul>
 	</div><!-- /navbar -->	
 	<div data-role="content">
-		
 		<div data-role="collapsible" data-collapsed="true" class="new-comment"> 
 			<h3>Make a comment</h3> 
-			<form action="#" method="get"> 
+			<form action="#" method="POST" enctype="multipart/form-data"> 
 				<div data-role="fieldcontain">
 					<label for="textarea">Comment:</label>
 					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
 				</div>
 				<div data-role="fieldcontain"> 
 					<label for="slider">Attachment:</label> 
-					<input type="file" size="30" id="file" name="file" />
+					<input type="file" onchange="alert(this.value);" size="30" id="file" name="file" />
 				</div> 
 				<fieldset class="ui-grid-a"> 
 						<div class="ui-block-a"><button type="submit" data-theme="c">Cancel</button></div> 
@@ -340,7 +388,7 @@
 	<div data-role="navbar" data-theme="a">
 		<ul>
 			<li><a href="#details">Details</a></li>
-			<li><a href="#comments" class="ui-btn-active">Comments ( 3 )</a></li>
+			<li><a href="#comments" class="ui-btn-active">Comments</a></li>
 		</ul>
 	</div><!-- /navbar -->	
 	<div data-role="content">	
@@ -352,54 +400,6 @@
 		<img src="images/album-bb.jpg" /> 
 		<p>Bone Appetit.</p> 
 	</div><!-- /content#attachment1 -->
-</div><!-- /page -->
-
-<div data-role="page" id="add">
-	<div data-role="header" data-theme="a" data-position="inline">
-		<h1>Add Task</h1>	
-	</div><!-- /header -->
-	<div data-role="content" >	
-		<form action="index.html" method="post">
-			<div data-role="fieldcontain"> 
-				<label for="title" class="ui-input-text">Title</label>	
-				<input type="text" name="name" id="title" value="" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
-			</div>
-			<div data-role="fieldcontain"> 			
-				<label for="description" class="ui-input-text">Description</label>	
-				<textarea cols="40" rows="8" name="description" id="textarea" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c"></textarea>
-			</div>
-			<div data-role="fieldcontain"> 
-				<label for="select-choice-1" class="select">Assign to</label> 
-				<select name="select-choice-1" id="select-choice-1"> 
-					<option value=""> </option> 
-				</select> 
-			</div>
-			<div data-role="collapsible" data-collapsed="true" class="form-element"> 
-				<h3>Completion Options</h3>
-				<div data-role="fieldcontain"> 			
-				    <fieldset data-role="controlgroup"> 
-				    	<legend>Priority</legend>				
-						<input type="radio" name="radio-choice-1" id="radio-choice-1" value="3" checked="checked" /> 
-						<label for="radio-choice-1">Urgent</label> 
-						<input type="radio" name="radio-choice-1" id="radio-choice-2" value="2"  /> 
-						<label for="radio-choice-2">Normal</label> 
-						<input type="radio" name="radio-choice-1" id="radio-choice-3" value="1"  /> 
-						<label for="radio-choice-3">Low</label> 
-					</fieldset>
-				</div>
-				<div data-role="fieldcontain"> 			
-					<label for="duedate">Due Date</label>
-	                <input type="date" name="duedate" id="duedate" value=""  />
-				</div>
-			</div>				
-			<div class="ui-body ui-body-b"> 
-				<fieldset class="ui-grid-a"> 
-					<div class="ui-block-a"><button type="submit" data-theme="d">Cancel</button></div> 
-					<div class="ui-block-b"><button type="submit" data-theme="a">Save</button></div>	   
-				</fieldset> 
-			</div>					
-		</form>
-	</div><!-- /content#details -->
 </div><!-- /page -->
 </body>
 </html>

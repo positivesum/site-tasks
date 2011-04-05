@@ -34,6 +34,7 @@
 			   dataType: 'json',	   
 			   success: function(data){
 					if (data.result) {
+						localStorage.url = domain;
 						localStorage.customDomain = domain;
 						chrome.pageAction.show(sender.tab.id);
 					}
