@@ -191,25 +191,24 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 						$comment_content = $_REQUEST['textarea'];
 						$commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'user_ID');
 						$comment_id = wp_new_comment( $commentdata );
-/*						
-						$slug = '';
-						$bits = file_get_contents();
-						$file = wp_upload_bits( $slug, NULL, $bits);
-						$url = $file['url'];
-						$file = $file['file'];
 
-						// Construct the attachment array
-						$attachment = array(
-							'post_title' => $slug,
-							'post_content' => $slug,
-							'post_status' => 'attachment',
-							'post_parent' => 0,
-							'post_mime_type' => $type,
-							'guid' => $url
-							);
-						// Save the data
-						$postID = wp_insert_attachment($attachment, $file);
-*/
+						if(isset($_FILES['attachment']['name'])){
+							$file = wp_upload_bits($_FILES["attachment"]["name"], null, file_get_contents($_FILES["attachment"]["tmp_name"]));
+							$url = $file['url'];
+							$file = $file['file'];
+							$wp_filetype = wp_check_filetype(basename($file), null );
+							
+							// Construct the attachment array
+							$attachment = array(
+								'post_mime_type' => $wp_filetype['type'],
+								'post_title' => preg_replace('/\.[^.]+$/', '', basename($file)),
+								'post_content' => '',
+								'post_status' => 'inherit',
+								'guid' => $url,
+								);
+							// Save the data
+							$attach_id = wp_insert_attachment($attachment, $file, $comment_id);
+						}
 					break;
 					case 'update-task':	
 						$id = intval($_REQUEST['id']);
@@ -281,6 +280,11 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 					$user_info = get_userdata($id);
 					$site_tasks->user_info = $user_info;
 					$comments = get_comments(array('post_id' => $site_tasks->ID));
+					
+					foreach ($comments as $comment) {
+						$comment->attachment = get_children( array('post_parent' => $comment->comment_ID, 'post_status' => 'inherit', 'post_type' => 'attachment') );
+					}
+					
 					$site_tasks->comments = $comments;
 				}
 			}
