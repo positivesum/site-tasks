@@ -132,6 +132,10 @@ function goToInbox() {
   });
 }
 
+function openUrl(url) {
+	chrome.tabs.create({url: url});
+}
+
 function setPageStatus() {
 	$("a:contains('Active')").removeClass('ui-btn-active');
 	$("a:contains('Completed')").removeClass('ui-btn-active');
@@ -225,16 +229,14 @@ function addTask(params) {
 	 });			
 }
 
-function addComment(params) {
+function updateComment() {
 	//cue the page loader 			
 	$.mobile.pageLoading();	
 	jQuery.ajax({
 	   type: "POST",
 	   url: getBlogUrl() + "/wp-admin/admin-ajax.php",
-	   data: 'action=chrome_site_tasks&operation=add-comment' + 
-			 '&url='	+ page_url +
-			 '&id='	+ current_task_id +			 
-			 '&' + params,			 
+	   data: 'action=chrome_site_tasks&operation=get-tasks' + 
+			 '&url='	+ page_url,			 
        dataType: 'json',	   
 	   success: function(data){
 			if (data.result) {
@@ -242,7 +244,6 @@ function addComment(params) {
 				users = data.result.users;
 				current_user = data.result.current_user;
 				setComments(current_task_id);
-				// setContent('active');
 				$.mobile.pageLoading( true );
 			}
 	   },
@@ -492,7 +493,7 @@ function setDetails(id) {
 		if (day < 10) {
 			day = '0' + day;
 		}
-		$('#details #duedate').val(  month + '/' + day + '/' +  date_due.getFullYear() );
+		$('#details #details-duedate').val(  month + '/' + day + '/' +  date_due.getFullYear() );
 	}
 }
 
@@ -534,7 +535,12 @@ function setComments(id) {
 			status = 'Restart';
 		}
 		$('#comments a.ui-btn-right span.ui-btn-text').html(status);
-				
+
+		$('#comments-form').attr('action', getBlogUrl() + "/wp-admin/admin-ajax.php");
+		$('#url').val(page_url);
+		$('#id').val(current_task_id);
+		$('#attachment').val('');
+		
 		var comment_count = 'Comments ( ' + task.comment_count + ' )';
 		$('#comments li.ui-block-b span.ui-btn-text').text(comment_count);
 		$('#comments ul:[data-role="listview"]').empty();
@@ -571,7 +577,17 @@ function setComments(id) {
 			} else {
 				time = '<strong>' + hours + ':' + minutes + '</strong> AM';
 			}
-			$('<li><h3>' + name + '</h3><p>' + task.comments[i].comment_content + '</p><p class="ui-li-aside">' + time + '</p></li>').appendTo('#comments ul:[data-role="listview"]'); 
+			var attachment = '';
+			var patt=/image/g;
+			for (var j in task.comments[i].attachment) {
+				attachment = task.comments[i].attachment[j];
+				if (patt.test(attachment.post_mime_type)) {
+					attachment = '<div style="float:left;padding:6px;"><a href="javascript:void(0)" onclick=\'openUrl(\"' + attachment.guid + '\");\'><img width="50px" src="' + attachment.guid + '" /></a></div>'
+				} else {
+					attachment = '<div style="float:left;padding:6px;"><a href="javascript:void(0)" onclick=\'openUrl(\"' + attachment.guid + '\");\'>' + attachment.post_title + '</a></div>'
+				}
+			}
+			$('<li>' + attachment + '<h3>' + name + '</h3><p>' + task.comments[i].comment_content + '</p><p class="ui-li-aside">' + time + '</p></li>').appendTo('#comments ul:[data-role="listview"]'); 
 		}
 		count = $('#comments ul:[data-role="listview"] li span.ui-li-count').length;
 		$('#comments ul:[data-role="listview"] li span.ui-li-count').each(function(index) {
