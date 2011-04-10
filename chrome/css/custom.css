@@ -23,3 +23,7 @@
  .tasks a { line-height: 2.75em; }
 
 body { min-width:400px; max-width:480px; min-height:400px; max-height:480px;}
+
+.ui-li-desc, .ui-li .ui-btn-text  {
+	white-space: normal;
+}
