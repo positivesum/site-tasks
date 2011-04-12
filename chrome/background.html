@@ -36,6 +36,19 @@
 					if (data.result) {
 						localStorage.url = domain;
 						localStorage.customDomain = domain;
+						var priority = checkTasksPriority(data.result.current_user.ID, data.result.tasks);
+						var icon = "icons/icon_32.png";
+						switch (priority) {
+							case 'normal': 
+								icon = "icons/icon_32-yellow.png";
+								break;
+							case 'urgent':
+								icon = "icons/icon_32-red.png";
+								break;
+							default:
+								icon = "icons/icon_32-grey.png";
+						}							
+						chrome.pageAction.setIcon({path: icon, tabId: sender.tab.id});
 						chrome.pageAction.show(sender.tab.id);
 					}
 			   },

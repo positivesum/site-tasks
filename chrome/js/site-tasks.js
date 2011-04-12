@@ -59,6 +59,36 @@ function getUserById(id) {
 	return user;
 }
 
+function checkTasksPriority(user_id, tasks) {
+	var priority = false;
+	for (var i in tasks) {
+		var task = tasks[i];
+		if (task.custom.tasks_owner[0] != user_id) {
+			continue;
+		}
+		if (task.custom.tasks_status[0] != 6) {
+			if (task.custom.tasks_status[0] < 2) {
+				status = 'Start';
+			} else {
+				status = 'Finish';
+			}
+			switch (task.custom.tasks_priority[0]) { // 1 => 'Low', 2 => 'Normal', 3 => 'Urgent'
+				case '1': 
+					if (priority != 'normal') {
+						priority = 'low';
+					}
+					break;
+				case '2': priority = 'normal';
+					break;
+				case '3': priority = 'urgent';
+					return priority;
+					break;
+			}
+		}
+	}
+	return priority;
+}
+
 // get the URL of the blog
 // e.g. http://example.com
 function getBlogUrl() {
@@ -460,9 +490,7 @@ function setDetails(id) {
 			} else {
 				status = 'Finish';
 			}
-			// $('#details a.ui-btn-right').show();
 		} else {
-			// $('#details a.ui-btn-right').hide();
 			status = 'Restart';
 		}
 		$('#details a.ui-btn-right span.ui-btn-text').html(status);
