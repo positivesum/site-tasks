@@ -426,7 +426,8 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 		}
 		
 		function site_tasks_template_redirect() {
-			if(is_admin()) return;
+			global $is_chrome;
+			if(is_admin() || $is_chrome) return;
 			wp_enqueue_style( self::POSTTYPE, $this->pluginUrl . '/css/themes/base/ui.all.css' );			
 			wp_enqueue_script('site-tasks', $this->pluginUrl . '/js/site-tasks.js', array('jquery'), '1.0'); // 						
 			wp_enqueue_script('site-tasks-frontend', $this->pluginUrl . '/js/site-tasks-frontend.js', 
