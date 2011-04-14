@@ -19,28 +19,28 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 		public $pluginUrl;	
 		private $metaFields = array('tasks_post_id', 'tasks_post_type', 'tasks_owner', 'tasks_date_due', 'tasks_status', 'tasks_priority');
 		private $tagLabels = array(
-			'name' =>  'Site Tasks Tags',
-			'singular_name' =>  'Site Tasks Tag',
-			'search_items' =>  'Search Site Tasks Tags', 
-			'all_items' => 'All Site Tasks Tags',
+			'name' =>  'Tasks Tags',
+			'singular_name' =>  'Tasks Tag',
+			'search_items' =>  'Search Tasks Tags', 
+			'all_items' => 'All Tasks Tags',
 			'parent_item' => null,
 			'parent_item_colon' =>  null,
-			'edit_item' =>  'Edit Site Tasks Tag',
-			'update_item' =>  'Update Site Tasks Tag',
-			'add_new_item' =>  'Add New Site Tasks Tag',
-			'new_item_name' =>  'New Site Tasks Tag Name', 
+			'edit_item' =>  'Edit Tasks Tag',
+			'update_item' =>  'Update Tasks Tag',
+			'add_new_item' =>  'Add New Tasks Tag',
+			'new_item_name' =>  'New Tasks Tag Name', 
 		);		
 		private $taxonomyLabels = array(
-			'name' =>  'Site Tasks Categories',
-			'singular_name' =>  'Site Tasks Category',
-			'search_items' =>  'Search Site Tasks Categories', 
-			'all_items' => 'All Site Tasks Categories',
-			'parent_item' => 'Parent Site Tasks Category',
-			'parent_item_colon' =>  'Parent Site Tasks Category:',
+			'name' =>  'Tasks Categories',
+			'singular_name' =>  'Tasks Category',
+			'search_items' =>  'Search Tasks Categories', 
+			'all_items' => 'All Tasks Categories',
+			'parent_item' => 'Parent Tasks Category',
+			'parent_item_colon' =>  'Parent Tasks Category:',
 			'edit_item' =>  'Edit Site Tasks Category',
-			'update_item' =>  'Update Site Tasks Category',
-			'add_new_item' =>  'Add New Site Tasks Category',
-			'new_item_name' =>  'New Site Tasks Category Name', 
+			'update_item' =>  'Update Tasks Category',
+			'add_new_item' =>  'Add New Tasks Category',
+			'new_item_name' =>  'New Tasks Category Name', 
 		);		
 		
 		private $priorities = array(1 => 'Low', 2 => 'Normal', 3 => 'Urgent');		
@@ -65,20 +65,20 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			// Register custom post types
 			register_post_type(self::POSTTYPE, array(
 				'labels' => array(
-										'name' => __('Site Tasks List'),
-										'singular_name' => __( 'Site Tasks' ),
+										'name' => __('Site Tasks'),
+										'singular_name' => __( 'Site Task' ),
 										'add_new' => __( 'Add New' ),
-										'add_new_item' => __( 'Add New Site Tasks' ),
+										'add_new_item' => __( 'Add New Site Task' ),
 										'edit' => __( 'Edit' ),
-										'edit_item' => __( 'Edit Site Tasks' ),
-										'new_item' => __( 'New Site Tasks' ),
+										'edit_item' => __( 'Edit Site Task' ),
+										'new_item' => __( 'New Site Task' ),
 										'view' => null,
 										'view_item' => null,
 										'search_items' => __( 'Search Site Tasks' ),
 										'not_found' => __( 'No Site Tasks found' ),
 										'not_found_in_trash' => __( 'No Site Tasks found in Trash' ),
 							),
-				'singular_label' => __('Site Tasks'),
+				'singular_label' => __('Site Task'),
 				'exclude_from_search' => true,
 				'public' => true,
 				'show_ui' => true, // UI in admin panel
@@ -313,8 +313,8 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 		}
 
 		function site_tasks_admin_menu() {
-			add_meta_box('site-tasks-div', 'Site Tasks List', array(&$this, 'site_tasks_metabox_page'), 'page', 'side');
-			add_meta_box('site-tasks-div', 'Site Tasks List', array(&$this, 'site_tasks_metabox_page'), 'post', 'side');			
+			add_meta_box('site-tasks-div', 'Site Tasks', array(&$this, 'site_tasks_metabox_page'), 'page', 'side');
+			add_meta_box('site-tasks-div', 'Site Tasks', array(&$this, 'site_tasks_metabox_page'), 'post', 'side');			
 		}
 
 		function site_tasks_metabox_page() {
