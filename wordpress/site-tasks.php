@@ -10,11 +10,11 @@ Author URI: http://www.odesk.com/users/~~94ca72c849152a57
 
 if ( !class_exists( 'The_Site_Tasks' ) ) {
 	class The_Site_Tasks {
-		const POSTTYPE				= 'site_tasks';	
-		const TAXONOMY				= 'site_tasks_cat';		
-		const TAXREWRITE			= 'site_tasks/category';				
-		const TAG   				= 'site_tasks_tag';				
-		const TAGREWRITE			= 'site_tasks/tag';				
+		const POSTTYPE				= 'site_task';	
+		const TAXONOMY				= 'site_task_cat';		
+		const TAXREWRITE			= 'site_task/category';				
+		const TAG   				= 'site_task_tag';				
+		const TAGREWRITE			= 'site_task/tag';				
 		public $theme;
 		public $pluginUrl;	
 		private $metaFields = array('tasks_post_id', 'tasks_post_type', 'tasks_owner', 'tasks_date_due', 'tasks_status', 'tasks_priority');
@@ -86,7 +86,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 				'_edit_link' => 'post.php?post=%d',
 				'capability_type' => 'post',
 				'hierarchical' => false,
-				'rewrite' => array("slug" => "site_tasks"), // Permalinks
+				'rewrite' => array("slug" => "site_task"), // Permalinks
 				'query_var' => false, // This goes to the WP_Query schema
 				'supports' => array('title', 'editor', 'author', 'comments')
 			));
@@ -112,7 +112,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			if(is_admin()){
 				add_filter("post_updated_messages", array(&$this, "site_tasks_post_updated_messages"));							
 				add_filter("post_row_actions", array(&$this, "site_tasks_row_actions"));							
-				add_filter("manage_edit-site_tasks_columns", array(&$this, "site_tasks_edit_columns"));				
+				add_filter("manage_edit-site_task_columns", array(&$this, "site_tasks_edit_columns"));				
 				add_action("admin_enqueue_scripts", array( &$this, "site_tasks_add_styles" ) );											
 				// Admin interface init
 				add_action("admin_init", array(&$this, "site_tasks_admin_init"));
@@ -149,7 +149,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			if ($post_id > 0) {
 				switch ( $action ) {
 					case 'add-task':	
-						$id = wp_insert_post( array( 'post_type' => 'site_tasks', 'post_title' => $_REQUEST['name'], 'post_content' => $_REQUEST['description'], 'post_status' => 'publish' ) );
+						$id = wp_insert_post( array( 'post_type' => 'site_task', 'post_title' => $_REQUEST['name'], 'post_content' => $_REQUEST['description'], 'post_status' => 'publish' ) );
 						$post = get_post($post_id);	
 						update_post_meta($id, 'tasks_post_id', $post_id);
 						update_post_meta($id, 'tasks_post_type', $post->post_type);
@@ -299,7 +299,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			$post_id = intval($_REQUEST["tasks_post_id"]);						
 			switch ( $action ) {
 				case 'add':			
-					wp_insert_post( array( 'post_title' => $_REQUEST['post_title'], 'post_type' => 'site_tasks', 'post_status' => 'publish' ) );
+					wp_insert_post( array( 'post_title' => $_REQUEST['post_title'], 'post_type' => 'site_task', 'post_status' => 'publish' ) );
 				break;			
 				case 'update':			
 					$id = intval($_REQUEST['post_ID']);
@@ -407,7 +407,7 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 							</div>
 						</div>				
 						<p class="textright">
-							<a class="button" href="'.admin_url().'edit.php?post_type=site_tasks">Goto Site Tasks List</a>
+							<a class="button" href="'.admin_url().'edit.php?post_type=site_task">Goto Site Tasks List</a>
 						</p>';	
 			return $output;			
 		}
@@ -440,7 +440,10 @@ meta_value=%s", $page_id ));
 			if ( is_array( $results ) && count( $results ) ) {
 				$return = array();						
 				foreach ( $results as $row ) {
-					$return[] = get_post($row->ID, $output);
+					$post = get_post($row->ID, $output);
+					if ($post->post_type == self::POSTTYPE) {
+						$return[] = $post;
+					}
 				}
 				return $return;
 			}
@@ -490,7 +493,7 @@ meta_value=%s", $page_id ));
 		
 		
 		function site_tasks_admin_init() {
-			add_meta_box('site-tasks-post-div', 'Site Tasks Details', array(&$this, 'site_tasks_metabox_admin'), 'site_tasks', 'normal', 'high');
+			add_meta_box('site-tasks-post-div', 'Site Tasks Details', array(&$this, 'site_tasks_metabox_admin'), 'site_task', 'normal', 'high');
 		}
 
 		function site_tasks_add_styles() {
@@ -502,8 +505,8 @@ meta_value=%s", $page_id ));
 				"cb" => "<input type=\"checkbox\" />",
 				"title" => "Title",
 				"tasks_post_id" => "Post/Page",				
-				"site_tasks_cat" => "Category",				
-				"site_tasks_tag" => "Tags",
+				"site_task_cat" => "Category",				
+				"site_task_tag" => "Tags",
 				"tasks_date_due" => "Due",				
 				"tasks_priority" => "Priority",				
 				"tasks_status" => "Status",				
@@ -522,11 +525,11 @@ meta_value=%s", $page_id ));
 						echo sprintf('<a href="%s">%s</a>',get_permalink($id), $page->post_title);					
 					}
 					break;								
-				case 'site_tasks_cat':
+				case 'site_task_cat':
 					$site_tasks_cats = get_the_term_list( $post_id, self::TAXONOMY, '', ', ', '' );
 					echo ( $site_tasks_cats ) ? strip_tags( $site_tasks_cats ) : '';
 					break;								
-				case 'site_tasks_tag':
+				case 'site_task_tag':
 					$site_tasks_tags = get_the_term_list( $post_id, self::TAG, '', ', ', '' );
 					echo ( $site_tasks_tags ) ? strip_tags( $site_tasks_tags ) : '';
 					break;													
@@ -841,21 +844,21 @@ meta_value=%s", $page_id ));
             </table>
 			<?php $this->site_tasks_get_summary(); ?>
             <p class="textright">
-				<a class="button" href="edit.php?post_type=site_tasks">Goto Site Tasks List</a>
+				<a class="button" href="edit.php?post_type=site_task">Goto Site Tasks List</a>
 			</p>
             <?php
         }
         else{
             ?>
             <div>
-                <?php echo sprintf("You don't have any Site Tasks items. Let's go %s create one %s!", '<a href="post-new.php?post_type=site_tasks">', '</a>'); ?>
+                <?php echo sprintf("You don't have any Site Tasks items. Let's go %s create one %s!", '<a href="post-new.php?post_type=site_task">', '</a>'); ?>
             </div>
             <?php
         }
     }
 	
 	function site_tasks_get_list($args = '') {
-		$args['post_type'] = 'site_tasks';
+		$args['post_type'] = 'site_task';
 		return get_posts($args);
     }	
 
@@ -871,17 +874,17 @@ meta_value=%s", $page_id ));
 		$urgent = count($this->site_tasks_get_list($args));
 		$output_html = "<ul class='subsubsub'>";
 		if ($urgent > 0) {
-			$output_html .= "<li><a class='urgent' href='edit.php?meta_key=tasks_priority&amp;meta_value=3&amp;post_type=site_tasks'>Urgent <span>(".$urgent.")</span></a> |</li>";		
+			$output_html .= "<li><a class='urgent' href='edit.php?meta_key=tasks_priority&amp;meta_value=3&amp;post_type=site_task'>Urgent <span>(".$urgent.")</span></a> |</li>";		
 		} else {
 			$output_html .= "<li><span class='urgent'>Urgent <span>(".$urgent.")</span></span> |</li>";				
 		}	
 		if ($normal > 0) {
-			$output_html .= "<li><a class='normal' href='edit.php?meta_key=tasks_priority&amp;meta_value=2&amp;post_type=site_tasks'>Normal <span>(".$normal.")</span></a> |</li>";		
+			$output_html .= "<li><a class='normal' href='edit.php?meta_key=tasks_priority&amp;meta_value=2&amp;post_type=site_task'>Normal <span>(".$normal.")</span></a> |</li>";		
 		} else {
 			$output_html .= "<li><span class='normal'>Normal <span>(".$normal.")</span></span> |</li>";				
 		}	
 		if ($low > 0) {
-			$output_html .= "<li><a class='low' href='edit.php?meta_key=tasks_priority&amp;meta_value=1&amp;post_type=site_tasks'>Low <span>(".$low.")</span></a></li>";		
+			$output_html .= "<li><a class='low' href='edit.php?meta_key=tasks_priority&amp;meta_value=1&amp;post_type=site_task'>Low <span>(".$low.")</span></a></li>";		
 		} else {
 			$output_html .= "<li><span class='low'>Low <span>(".$low.")</span></span></li>";				
 		}			
