@@ -34,7 +34,7 @@
 			   dataType: 'json',	   
 			   success: function(data){
 					if (data.result) {
-						localStorage.url = domain;
+						localStorage.url = sender.tab.url;
 						localStorage.customDomain = domain;
 						var priority = checkTasksPriority(data.result.current_user.ID, data.result.tasks);
 						var icon = "icons/icon_32.png";

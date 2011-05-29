@@ -365,8 +365,12 @@ function setContent(page) {
 							break;
 						case '3': priority = 'Urgent';
 							break;
-					}			
-					$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#completed ul:[data-role="listview"]');
+					}
+					var name = task.user_info.user_login;
+					if ((task.user_info.first_name != '') && (task.user_info.last_name != '')) {
+						name = task.user_info.first_name + ' ' + task.user_info.last_name;
+					}
+					$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#completed ul:[data-role="listview"]');
 				}
 			}
 			$('#completed ul:[data-role="listview"]').listview('refresh');
@@ -419,8 +423,12 @@ function setContent(page) {
 								break;
 							case '3': priority = 'Urgent';
 								break;
-						}			
-						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-my ul:[data-role="listview"]');
+						}
+						var name = task.user_info.user_login;
+						if ((task.user_info.first_name != '') && (task.user_info.last_name != '')) {
+							name = task.user_info.first_name + ' ' + task.user_info.last_name;
+						}
+						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-my ul:[data-role="listview"]');
 						
 					}
 				}
@@ -469,8 +477,12 @@ function setContent(page) {
 								break;
 							case '3': priority = 'Urgent';
 								break;
-						}			
-						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + task.user_info.first_name + ' ' + task.user_info.last_name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-all ul:[data-role="listview"]');
+						}
+						var name = task.user_info.user_login;
+						if ((task.user_info.first_name != '') && (task.user_info.last_name != '')) {
+							name = task.user_info.first_name + ' ' + task.user_info.last_name;
+						}
+						$('<li><h3><a onclick="current_task_id=' + task.ID + ';" href="#details">' + task.post_title + '</a></h3><p>Completed by <strong>' + name + '</strong> on <strong>' + dateToStr(task.custom.tasks_date_due[0]) + '</strong></p><span class="ui-li-count">' + priority + '</span></li>').appendTo('#show-all ul:[data-role="listview"]');
 					}
 				}
 			}
@@ -501,12 +513,17 @@ function setDetails(id) {
 		$('#details #title').val(task.post_title);
 		$('#details #textarea').val(task.post_content);
 		$('#details #select-choice-1').empty();
+		
 		for (var i in users) {
+			var selected = '';
 			if (task.custom.tasks_owner[0] == users[i].ID) {
-				var obj = $('<option value="' + users[i].ID + '" selected >' + users[i].first_name + ' ' + users[i].last_name + '</option>');
-			} else {
-				var obj = $('<option value="' + users[i].ID + '">' + users[i].first_name + ' ' + users[i].last_name + '</option>');
+				var selected = 'selected';
 			}
+			var name = users[i].user_login;
+			if ((users[i].first_name != '') && (users[i].last_name != '')) {
+				name = users[i].first_name + ' ' + users[i].last_name;			
+			}
+			var obj = $('<option value="' + users[i].ID + '" ' + selected + ' >' + name + '</option>');
 			obj.appendTo('#details #select-choice-1');
 		}
 		$('#details #select-choice-1').selectmenu('refresh', true);
@@ -528,11 +545,15 @@ function setDetails(id) {
 function setAdd() {
 	$('#add #select-choice-1').empty();
 	for (var i in users) {
+		var selected = '';
 		if ( current_user.ID == users[i].ID) {
-			var obj = $('<option value="' + users[i].ID + '" selected >' + users[i].first_name + ' ' + users[i].last_name + '</option>');
-		} else {
-			var obj = $('<option value="' + users[i].ID + '">' + users[i].first_name + ' ' + users[i].last_name + '</option>');
+			selected = 'selected';
 		}
+		var name = users[i].user_login;
+		if ((users[i].first_name != '') && (users[i].last_name != '')) {
+			name = users[i].first_name + ' ' + users[i].last_name;
+		}
+		var obj = $('<option value="' + users[i].ID + '" ' + selected + ' >' + name + '</option>');
 		obj.appendTo('#add #select-choice-1');
 	}
 	$('#add #select-choice-1').selectmenu('refresh', true);
@@ -589,7 +610,11 @@ function setComments(id) {
 				$('<li data-role="list-divider">' + current_date.toDateString() + '<span class="ui-li-count"></span></li>').appendTo('#comments ul:[data-role="listview"]'); 
 			}
 			if (user != null) {
-				name = user.first_name + ' ' + user.last_name;
+				if ((user.first_name != '') && (user.last_name != '')) {
+					name = user.first_name + ' ' + user.last_name;
+				} else {
+					name = user.user_login;
+				}
 			}
 
 			hours = task_date.getHours();
