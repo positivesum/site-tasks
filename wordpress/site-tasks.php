@@ -128,7 +128,8 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			wp_enqueue_style( self::POSTTYPE.'-admin', $this->pluginUrl . '/css/site-tasks.css' );		
 			add_action("template_redirect", array(&$this, "site_tasks_template_redirect"));			
 			add_action('wp_ajax_chrome_site_tasks', array(&$this, "site_tasks_chrome_ajax"));			
-			add_action('wp_ajax_wp_site_tasks', array(&$this, "site_tasks_wp_ajax"));			
+			add_action('wp_ajax_wp_site_tasks', array(&$this, "site_tasks_wp_ajax"));
+			add_action('wp_ajax_nopriv_import_site_tasks', array(&$this, "import_site_tasks"));			
 		}
 
 		//Target of WPRackTest plugin filter. Provides the plugin
@@ -312,6 +313,62 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			die();				
 		}
 
+		function import_site_tasks() {
+			$response = '';
+			$action = isset( $_REQUEST['operation'] ) ? $_REQUEST['operation'] : 'get-tasks';
+			switch ( $action ) {
+				case 'get-tasks':
+					$site_tasks_list = $this->get_tasks_by_post_id();
+					if($site_tasks_list){
+						foreach($site_tasks_list as $site_tasks){
+							$id = absint($site_tasks->ID);				
+							$custom = get_post_custom($id);
+							$id = get_post_meta( $id , 'tasks_owner' , true ); 				
+							$user_info = get_userdata($id);
+							$external_id = '&#160;';
+							$name = '&#160;';
+							$description = '&#160;';
+							$requested_by =  $user_info->user_login;
+							$created_at = '&#160;';
+							$story_type = '&#160;';
+							$estimate = '&#160;';
+							
+							if ($site_tasks->ID > 0) {
+								$external_id = $site_tasks->ID;
+							}
+							if ($site_tasks->post_title != '') {
+								$name = $site_tasks->post_title;
+							}
+							if ($site_tasks->post_content != '') {
+								$description = $site_tasks->post_content;
+							}
+							if (($user_info->first_name != '') && ($user_info->last_name != '')) {
+								$requested_by = $user_info->first_name . ' ' . $user_info->last_name;
+							}
+							if ($site_tasks->post_date_gmt != '') {
+								$created_at = $site_tasks->post_date_gmt;
+							}
+							
+							$response .= '<external_story>
+									<external_id>' . $external_id . '</external_id>
+									<name>' . $name . '</name>
+									<description>' . $description . '</description>
+									<requested_by>' . $requested_by . '</requested_by> 
+									<created_at type="datetime">' . $created_at . '</created_at>
+									<story_type>feature</story_type>
+									<estimate type="integer">0</estimate>
+							</external_story>';
+						}
+					}
+				break;			
+			}
+			$response = '<?xml version="1.0" encoding="UTF-8"?><external_stories type="array">'
+						. $response . 
+						'</external_stories>';
+			echo($response);
+			die();				
+		}
+		
 		function site_tasks_admin_menu() {
 			add_meta_box('site-tasks-div', 'Site Tasks', array(&$this, 'site_tasks_metabox_page'), 'page', 'side');
 			add_meta_box('site-tasks-div', 'Site Tasks', array(&$this, 'site_tasks_metabox_page'), 'post', 'side');			
@@ -434,10 +491,14 @@ if ( !class_exists( 'The_Site_Tasks' ) ) {
 			array('jquery', 'jquery-ui-core', 'jquery-ui-draggable', 'jquery-ui-resizable', 'jquery-ui-dialog'), '1.0');			
 		}
 
-		function get_tasks_by_post_id($page_id, $output = OBJECT) {
+		function get_tasks_by_post_id($page_id = 0, $output = OBJECT) {
 			global $wpdb;
-			$results = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT post_id as ID FROM $wpdb->postmeta WHERE meta_key ='tasks_post_id'  AND 	
-meta_value=%s", $page_id ));
+			if ($page_id > 0) {
+				$results = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT post_id as ID FROM $wpdb->postmeta WHERE meta_key ='tasks_post_id'  AND 	
+	meta_value=%s", $page_id ));
+			} else {
+				$results = $wpdb->get_results($wpdb->prepare("SELECT DISTINCT post_id as ID FROM $wpdb->postmeta WHERE meta_key ='tasks_post_id' "));
+			}
 			if ( is_array( $results ) && count( $results ) ) {
 				$return = array();						
 				foreach ( $results as $row ) {
