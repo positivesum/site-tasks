@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name:  Site Tasks WordPress Plugin
-Plugin URI: http://positivesum.org/
+Plugin Name: Site Tasks 
+Plugin URI: http://wordpress.org/extend/plugins/site-tasks/ 
 Description:  Ability to create/edit/delete tasks. Dashboard widget that shows available site tasks
-Version: 0.1
-Author: Alexander Yachmenev
-Author URI: http://www.odesk.com/users/~~94ca72c849152a57
+Version: 0.8 
+Author: Taras Mankovski 
+Author URI: http://taras.cc 
 */
 
 if ( !class_exists( 'The_Site_Tasks' ) ) {
